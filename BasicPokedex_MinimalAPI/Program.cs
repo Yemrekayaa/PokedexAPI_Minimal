@@ -1,4 +1,5 @@
 using BasicPokedex_MinimalAPI;
+using BasicPokedex_MinimalAPI.Models;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -21,9 +22,14 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-app.MapGet("/pokemon/{id:int}", (int id) =>
+app.MapGet("/api/pokemon/{id:int}", async (int id, PokedexDbContext db) =>
 {
-    return Results.Ok(id);
+    return await db.Pokemons.FindAsync(id) is Pokemon pokemon ? Results.Ok(pokemon) : Results.NotFound();
+});
+
+app.MapGet("/api/pokemon", async (PokedexDbContext db) =>
+{
+    return await db.Pokemons.ToListAsync();
 });
 
 app.Run();
